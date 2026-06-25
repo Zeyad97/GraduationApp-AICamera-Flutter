@@ -131,7 +131,12 @@ class DatabaseService {
   // Alert operations
   Future<void> insertAlert(AlertModel alert) async {
     final db = await database;
-    await db.insert('alerts', alert.toMap());
+    await db.insert('alerts', alert.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> insertOrUpdateAlert(AlertModel alert) async {
+    final db = await database;
+    await db.insert('alerts', alert.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<AlertModel>> getAllAlerts() async {
@@ -173,7 +178,12 @@ class DatabaseService {
   // Contact operations
   Future<void> insertContact(ContactModel contact) async {
     final db = await database;
-    await db.insert('contacts', contact.toMap());
+    await db.insert('contacts', contact.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> insertOrUpdateContact(ContactModel contact) async {
+    final db = await database;
+    await db.insert('contacts', contact.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<ContactModel>> getContactsByUserId(String userId) async {
@@ -208,7 +218,12 @@ class DatabaseService {
   // Message operations
   Future<void> insertMessage(MessageModel message) async {
     final db = await database;
-    await db.insert('messages', message.toMap());
+    await db.insert('messages', message.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> insertOrUpdateMessage(MessageModel message) async {
+    final db = await database;
+    await db.insert('messages', message.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<MessageModel>> getMessagesBetweenUsers(

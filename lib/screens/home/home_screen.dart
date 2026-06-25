@@ -23,7 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Defer data loading to after build phase completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
   Future<void> _loadData() async {
@@ -32,8 +35,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final contactProvider = Provider.of<ContactProvider>(context, listen: false);
 
     if (authProvider.currentUser != null) {
+      final userId = authProvider.currentUser!.id;
+      
+      // Initialize Firestore listeners for real-time updates
+      alertProvider.initializeUser(userId);
+      contactProvider.initializeUser(userId);
+      
+      // Load initial data
       await alertProvider.loadAlerts();
-      await contactProvider.loadContacts(authProvider.currentUser!.id);
+      await contactProvider.loadContacts(userId);
     }
   }
 
@@ -42,7 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final localization = AppLocalizations.of(context);
 
     final List<Widget> tabs = [
-      const DashboardTab(),
+      DashboardTab(
+        onViewAll: () => setState(() => _currentIndex = 1),
+      ),
       const AlertsTab(),
       const ContactsTab(),
       const MessagesTab(),

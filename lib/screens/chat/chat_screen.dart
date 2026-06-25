@@ -29,7 +29,10 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _loadMessages();
+    // Defer message loading to after build phase completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadMessages();
+    });
   }
 
   Future<void> _loadMessages() async {
@@ -80,8 +83,8 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    chatProvider.clearCurrentChat();
+    // Don't access context in dispose - it's deactivated by this point
+    // ChatProvider will handle cleanup automatically
     super.dispose();
   }
 

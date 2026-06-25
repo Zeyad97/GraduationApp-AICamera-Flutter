@@ -34,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.register(
+    final success = await authProvider.registerWithEmail(
       fullName: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -49,12 +49,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)?.translate('registration_failed') ??
+            authProvider.errorMessage ??
+                AppLocalizations.of(context)?.translate('registration_failed') ??
                 'Registration failed',
           ),
           backgroundColor: Colors.red,
         ),
       );
+      // Clear error message after showing
+      await authProvider.clearError();
+    }
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.signInWithGoogle();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            authProvider.errorMessage ??
+                AppLocalizations.of(context)?.translate('registration_failed') ??
+                'Registration failed',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      // Clear error message after showing
+      await authProvider.clearError();
     }
   }
 
@@ -201,6 +228,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(localization?.translate('sign_up') ?? 'Sign Up'),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: Colors.grey[400],
+                        thickness: 1,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Text(
+                        'or',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: Colors.grey[400],
+                        thickness: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: authProvider.isLoading ? null : _signUpWithGoogle,
+                  icon: const Icon(Icons.language),
+                  label: Text(
+                    localization?.translate('sign_in_with_google') ?? 'Sign in with Google',
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Row(

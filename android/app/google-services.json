@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "465795601024",
+    "project_id": "emergicam12",
+    "storage_bucket": "emergicam12.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465795601024:android:1672fa82b9f05988270c65",
+        "android_client_info": {
+          "package_name": "com.emergicam.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "465795601024-qmtpg0civjl4qe8uq5kisor7itd5vaja.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emergicam.app",
+            "certificate_hash": "fec48c1bd64209de2419da3481285a8246ee43ba"
+          }
+        },
+        {
+          "client_id": "465795601024-637q0gcasknkpl0bitgi6q3qmi8iji6d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoghTyv46gHt3EXTt9oZqVnYSZOi09zQg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "465795601024-637q0gcasknkpl0bitgi6q3qmi8iji6d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

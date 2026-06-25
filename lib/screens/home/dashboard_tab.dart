@@ -8,7 +8,8 @@ import '../../models/alert_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DashboardTab extends StatelessWidget {
-  const DashboardTab({super.key});
+  final VoidCallback? onViewAll;
+  const DashboardTab({super.key, this.onViewAll});
 
   @override
   Widget build(BuildContext context) {
@@ -112,53 +113,6 @@ class DashboardTab extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-
-              // Test Alert Button
-              Card(
-                color: theme.colorScheme.primaryContainer,
-                child: InkWell(
-                  onTap: () => _showTestAlertDialog(context),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.warning_amber_rounded,
-                          size: 40,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                localization?.translate('test_alert') ??
-                                    'Test Alert',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                localization?.translate('test_alert_desc') ??
-                                    'Send a test alert to verify system',
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
               // Recent Alerts
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -171,9 +125,7 @@ class DashboardTab extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      // Navigate to alerts tab
-                    },
+                    onPressed: onViewAll,
                     child: Text(
                       localization?.translate('view_all') ?? 'View All',
                     ),
@@ -212,51 +164,6 @@ class DashboardTab extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showTestAlertDialog(BuildContext context) {
-    final localization = AppLocalizations.of(context);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final alertProvider = Provider.of<AlertProvider>(context, listen: false);
-    final contactProvider = Provider.of<ContactProvider>(context, listen: false);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localization?.translate('test_alert') ?? 'Test Alert'),
-        content: Text(
-          localization?.translate('test_alert_desc') ??
-              'Send a test alert to verify system',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(localization?.translate('cancel') ?? 'Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await alertProvider.createTestAlert(
-                userId: authProvider.currentUser!.id,
-                emergencyContacts: contactProvider.emergencyContacts,
-              );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      localization?.translate('alert_sent') ??
-                          'Alert sent successfully',
-                    ),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              }
-            },
-            child: Text(localization?.translate('send') ?? 'Send'),
-          ),
-        ],
       ),
     );
   }

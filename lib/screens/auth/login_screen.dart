@@ -28,9 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.login(
-      _emailController.text.trim(),
-      _passwordController.text,
+    final success = await authProvider.loginWithEmail(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
     );
 
     if (!mounted) return;
@@ -41,12 +41,39 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)?.translate('login_failed') ??
+            authProvider.errorMessage ??
+                AppLocalizations.of(context)?.translate('login_failed') ??
                 'Login failed',
           ),
           backgroundColor: Colors.red,
         ),
       );
+      // Clear error message after showing
+      await authProvider.clearError();
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.signInWithGoogle();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            authProvider.errorMessage ??
+                AppLocalizations.of(context)?.translate('login_failed') ??
+                'Login failed',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      // Clear error message after showing
+      await authProvider.clearError();
     }
   }
 
@@ -141,6 +168,38 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : Text(localization?.translate('sign_in') ?? 'Sign In'),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: Colors.grey[400],
+                          thickness: 1,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Text(
+                          'or',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          color: Colors.grey[400],
+                          thickness: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    onPressed: authProvider.isLoading ? null : _signInWithGoogle,
+                    icon: const Icon(Icons.language),
+                    label: Text(
+                      localization?.translate('sign_in_with_google') ?? 'Sign in with Google',
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Row(

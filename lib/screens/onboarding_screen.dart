@@ -192,14 +192,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _skip() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.markOnboardingAsSeen();
+    await authProvider.completeOnboarding();
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed('/login');
   }
 
   void _complete() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.markOnboardingAsSeen();
+    await authProvider.completeOnboarding();
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed('/login');
   }

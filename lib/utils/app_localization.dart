@@ -44,6 +44,7 @@ class AppLocalizations {
       'already_have_account': 'Already have an account?',
       'sign_in': 'Sign In',
       'sign_up': 'Sign Up',
+      'sign_in_with_google': 'Sign in with Google',
       
       // Onboarding
       'onboarding_title_1': 'AI-Powered Monitoring',
@@ -68,6 +69,7 @@ class AppLocalizations {
       'emergency_contacts': 'Emergency Contacts',
       'test_alert': 'Test Alert',
       'no_alerts': 'No alerts yet',
+      'view_all': 'View All',
       'no_contacts': 'No contacts yet',
       
       // Alerts
@@ -177,6 +179,7 @@ class AppLocalizations {
       'already_have_account': 'لديك حساب بالفعل؟',
       'sign_in': 'تسجيل الدخول',
       'sign_up': 'إنشاء حساب',
+      'sign_in_with_google': 'تسجيل الدخول عبر جوجل',
       
       // Onboarding
       'onboarding_title_1': 'مراقبة بالذكاء الاصطناعي',
@@ -201,6 +204,7 @@ class AppLocalizations {
       'emergency_contacts': 'جهات الاتصال الطارئة',
       'test_alert': 'اختبار التنبيه',
       'no_alerts': 'لا توجد تنبيهات بعد',
+      'view_all': 'عرض الكل',
       'no_contacts': 'لا توجد جهات اتصال بعد',
       
       // Alerts

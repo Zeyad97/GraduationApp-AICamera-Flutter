@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/contact_provider.dart';
-import '../../providers/chat_provider.dart';
 import '../../utils/app_localization.dart';
 import '../../models/contact_model.dart';
 import '../chat/chat_screen.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class MessagesTab extends StatefulWidget {
   const MessagesTab({super.key});
@@ -19,10 +17,10 @@ class _MessagesTabState extends State<MessagesTab> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Data is already loaded by HomeScreen, no need to load again
   }
 
-  Future<void> _loadData() async {
+  Future<void> _refreshData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final contactProvider = Provider.of<ContactProvider>(context, listen: false);
 
@@ -71,7 +69,7 @@ class _MessagesTabState extends State<MessagesTab> {
               ),
             )
           : RefreshIndicator(
-              onRefresh: () => _loadData(),
+              onRefresh: () => _refreshData(),
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: contactProvider.contacts.length,
@@ -99,113 +97,38 @@ class _ContactChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatProvider = Provider.of<ChatProvider>(context);
     final theme = Theme.of(context);
 
-    return FutureBuilder<Map<String, dynamic>>(
-      future: chatProvider.getLastMessageForContact(userId, contact.id),
-      builder: (context, snapshot) {
-        final lastMessageData = snapshot.data ?? {
-          'message': 'No messages yet',
-          'timestamp': null,
-          'unreadCount': 0,
-        };
-
-        final unreadCount = lastMessageData['unreadCount'] as int;
-        final lastMessage = lastMessageData['message'] as String;
-        final timestamp = lastMessageData['timestamp'] as DateTime?;
-
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            leading: Stack(
-              children: [
-                CircleAvatar(
-                  backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
-                  child: Text(
-                    contact.name[0].toUpperCase(),
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                if (unreadCount > 0)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 20,
-                        minHeight: 20,
-                      ),
-                      child: Text(
-                        unreadCount > 9 ? '9+' : unreadCount.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-              ],
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
+          child: Text(
+            contact.name[0].toUpperCase(),
+            style: TextStyle(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
             ),
-            title: Text(
-              contact.name,
-              style: TextStyle(
-                fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-            subtitle: Text(
-              lastMessage,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontWeight: unreadCount > 0 ? FontWeight.w500 : FontWeight.normal,
-              ),
-            ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (timestamp != null)
-                  Text(
-                    timeago.format(timestamp),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: unreadCount > 0
-                          ? theme.colorScheme.primary
-                          : Colors.grey[600],
-                    ),
-                  ),
-                if (contact.isEmergencyContact)
-                  const Icon(
-                    Icons.star,
-                    size: 16,
-                    color: Colors.red,
-                  ),
-              ],
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(
-                    contact: contact,
-                    userId: userId,
-                  ),
-                ),
-              );
-            },
           ),
-        );
-      },
+        ),
+        title: Text(contact.name),
+        subtitle: Text(
+          contact.relationshipString,
+          style: TextStyle(fontSize: 12),
+        ),
+        trailing: Icon(Icons.chevron_right),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                contact: contact,
+                userId: userId,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
