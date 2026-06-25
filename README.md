@@ -1,227 +1,172 @@
-# Smart AI Camera - Mobile App
+# EmergiCam — Smart AI Camera Mobile App
 
-A Flutter mobile application for the Smart AI Camera Medical Emergency Detection System. This app serves as the mobile companion to receive real-time alerts from an AI-powered camera system that detects falls, emergencies, and abnormal activities.
+A Flutter mobile application for the **Smart AI Camera Medical Emergency Detection System**. This app serves as the mobile companion to receive real-time alerts from an AI-powered camera system that detects falls, emergencies, and abnormal activities in elderly or vulnerable individuals. Includes real-time messaging between users and emergency contacts.
 
-**Developed by ZYAD** | Graduation Project 2025
+**Developed by ZYAD** | Graduation Project 2025 | AASTMT, Alexandria
 
-## 📱 Features
+---
 
-### ✅ Implemented Features
+## Features
 
-#### Authentication & Onboarding
-- Beautiful splash screen with animations
-- Multi-page onboarding flow
-- User registration and login
-- Profile management
-- Session persistence
+### Authentication & Onboarding
+- Animated splash screen with auto-navigation
+- 3-page onboarding flow for first-time users
+- Email/password registration & login with validation
+- Google Sign-In integration
+- Session persistence across app restarts
 
-#### User Interface
-- Modern Material Design 3 UI
-- Dark and Light theme support
-- Bilingual support (English & Arabic)
-- RTL support for Arabic
-- Smooth animations and transitions
-- Custom Google Fonts (Poppins)
-
-#### Emergency Alerts System
-- Real-time alert notifications
-- Test alert functionality
-- Alert history and tracking
-- Alert status management (Pending, Active, Acknowledged, Resolved, False Alarm)
-- Alert types: Fall, Emergency Gesture, Immobility, Abnormal Activity, Medical Emergency
-- Detailed alert view with timestamps
-- Push notifications for emergency situations
-
-#### Contacts Management
-- Add/Edit/Delete emergency contacts
-- Mark contacts as emergency responders
-- Contact relationships (Family, Friend, Caregiver, Doctor, Nurse)
-- Call functionality via phone integration
-- Emergency contact notification system
-
-#### Dashboard
-- Welcome card with user info
+### Dashboard
+- Welcome card with user avatar and name
 - Today's alerts counter
 - Emergency contacts counter
-- Recent alerts feed
-- Quick test alert button
-- Refresh functionality
+- Recent alerts feed (last 5)
+- Pull-to-refresh and View All navigation
 
-#### Settings
-- Theme toggle (Light/Dark/System)
-- Language switcher (English/Arabic)
-- Profile display
-- About section with version info
-- Logout functionality
+### Emergency Alerts
+- Real-time alert stream from AI camera system via Firestore
+- 7 alert types: Fall, Immobility, Emergency Gesture, Abnormal Activity, Medical Emergency, Manual, Test
+- 5 status stages: Pending, Active, Acknowledged, Resolved, False Alarm
+- Status management with timestamps
+- Local push notifications with haptic feedback
+- Emergency vs test notification differentiation
+- Duplicate notification prevention
 
-#### Camera Integration Guide
-- Detailed setup instructions
-- API configuration interface
-- Technical documentation
+### Contacts Management
+- Full CRUD operations with offline SQLite fallback
+- Relationship categorization: Family, Friend, Caregiver, Doctor, Nurse, Other
+- Emergency contact toggle
+- Direct phone call integration
+- Avatar with initials fallback
+
+### Real-Time Messaging
+- Firestore-based conversation system
+- Real-time message listener with auto-scroll
+- Read receipts (single/double check marks)
+- Date headers (Today, Yesterday, formatted date)
+- Sent/received message bubbles
+- Contact-based chat navigation
+
+### Settings & Personalization
+- Dark/Light/System theme toggle (Material Design 3)
+- Bilingual support: English & Arabic (full RTL)
+- Profile display section
+- Camera integration setup guide
+- App version and about info
+- Logout with confirmation dialog
+
+### Camera Integration Guide
+- 4-step setup instructions
+- Server URL + API Key configuration form
 - Connection status display
-- Step-by-step integration guide
+- Technical documentation reference
 
-## 🏗️ Architecture
+### Push Notifications
+- Dual notification channels:
+  - Emergency: max priority, red LED, vibration, full-screen intent
+  - Test: high priority, blue LED
+- Cancel individual or all notifications
 
-### State Management
-- **Provider** for state management
-- Separation of concerns with multiple providers:
-  - `AuthProvider` - Authentication and user session
-  - `ThemeProvider` - Theme management
-  - `LanguageProvider` - Localization
-  - `AlertProvider` - Alert management
-  - `ContactProvider` - Contact management
+---
 
-### Database
-- **SQLite** for local data persistence
-- Tables: Users, Alerts, Contacts, Messages
-- Efficient CRUD operations
-- Relational data structure
+## Architecture
 
-### Services
-- `DatabaseService` - SQLite database operations
-- `NotificationService` - Local push notifications
+### State Management — Provider (MVVM-like)
 
-### Localization
-- Custom `AppLocalizations` implementation
-- Support for English and Arabic
-- 100+ translated strings
-- Easy to extend for more languages
+| Layer | Components |
+|-------|-----------|
+| **Presentation** | 15 screens + reusable widgets |
+| **State Management** | 6 ChangeNotifier providers |
+| **Domain/Models** | 4 data models with toMap/fromMap/copyWith |
+| **Data/Service** | 6 services (Firebase Auth, Firestore, SQLite, Notifications) |
+| **Utilities** | Custom localization (151 keys × 2 languages) |
 
-## 🔮 Future Integration (Camera AI System)
-
-This mobile app is designed to connect with a Python-based AI detection server:
-
-### AI Backend Components (To be integrated)
+### Data Flow
 ```
-Python Server (Flask/FastAPI)
-├── OpenCV - Video capture & processing
-├── MediaPipe Pose - Skeleton detection (33 keypoints)
-├── TensorFlow - Gesture recognition (MLP/LSTM)
-├── Scikit-learn - Anomaly detection (Isolation Forest)
-└── REST API / WebSocket - Communication with mobile app
+User Action → Widget → Provider (ChangeNotifier)
+    ↓
+Firestore (primary success) → notify listeners → UI rebuild
+    ↓ fail
+SQLite (offline fallback) → notify listeners → UI rebuild
 ```
 
-### How Integration Will Work
+Real-time streams via Firestore `.snapshots()` for alerts and messages.
 
-1. **Server Setup**
-   - Install Python AI detection server on a computer
-   - Configure with camera feed (Webcam, USB, or RTSP stream)
-   - Set detection thresholds and preferences
+### Providers
+- **AuthProvider** — Authentication state, login/register/logout/session persistence
+- **ThemeProvider** — Light/dark/system theme mode
+- **LanguageProvider** — English/Arabic locale switching
+- **AlertProvider** — Alert CRUD + real-time Firestore listener + notifications
+- **ContactProvider** — Contact CRUD + emergency contact filtering
+- **ChatProvider** — Message CRUD + real-time Firestore listener + read receipts
 
-2. **API Connection**
-   - Enter server URL and API key in the app
-   - Establish WebSocket connection for real-time alerts
-   - REST API for alert history and configuration
+---
 
-3. **Real-Time Detection**
-   - AI server processes video frames
-   - Detects: Falls, Emergency Gestures, Immobility, Abnormal Activity
-   - Sends alerts to mobile app via API
+## Tech Stack
 
-4. **Alert Flow**
-   ```
-   Camera → AI Server → Detection → Alert Generation → 
-   Mobile App → Push Notification → Emergency Contacts
-   ```
+| Category | Technologies |
+|----------|-------------|
+| **Frontend** | Flutter, Material Design 3, Google Fonts (Poppins), Lottie |
+| **State Management** | Provider |
+| **Backend/Database** | Firebase (Auth, Firestore, Messaging, Realtime DB) + SQLite |
+| **Auth** | Firebase Auth (Email/Password + Google Sign-In) |
+| **Notifications** | flutter_local_notifications + Firebase Cloud Messaging |
+| **Localization** | Custom AppLocalizations (English & Arabic) |
+| **Persistence** | SharedPreferences + SQLite |
 
-### API Endpoints (To be implemented in backend)
-
-```
-POST /api/alert/send          - Send alert from AI server to app
-GET  /api/alerts              - Get alert history
-PUT  /api/alert/:id/status    - Update alert status
-POST /api/camera/connect      - Connect camera to system
-GET  /api/camera/status       - Get camera status
-POST /api/config/thresholds   - Update detection thresholds
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Flutter SDK (3.9.2 or higher)
-- Dart SDK
-- Android Studio / VS Code
-- Android device or emulator
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd grad_app
-   ```
-
-2. **Install dependencies**
-   ```bash
-   flutter pub get
-   ```
-
-3. **Run the app**
-   ```bash
-   flutter run
-   ```
-
-### First Time Setup
-
-1. Launch the app
-2. Complete onboarding
-3. Register a new account
-4. Add emergency contacts
-5. Test the alert system using "Test Alert" button
-6. Explore settings and customize theme/language
-
-## 📦 Dependencies
-
+### Key Dependencies
 ```yaml
-# UI & Design
-google_fonts: ^6.1.0
-flutter_svg: ^2.0.9
-lottie: ^3.0.0
-
-# State Management
-provider: ^6.1.1
-
-# Storage
-shared_preferences: ^2.2.2
-sqflite: ^2.3.0
-path_provider: ^2.1.1
-
-# Notifications
-flutter_local_notifications: ^16.3.0
-
-# Localization
-intl: ^0.19.0
-
-# Communications
-url_launcher: ^6.2.2
-permission_handler: ^11.1.0
-
-# Utils
-uuid: ^4.2.2
-timeago: ^3.6.0
+provider: ^6.1.1               # State management
+firebase_core: ^3.1.0          # Firebase initialization
+firebase_auth: ^5.1.0          # Authentication
+cloud_firestore: ^5.1.0        # Real-time database
+sqflite: ^2.3.0                # Local SQLite storage
+flutter_local_notifications: ^17.2.3  # Push notifications
+google_fonts: ^6.1.0           # Custom typography
+lottie: ^3.0.0                 # Animations
+intl: ^0.20.2                  # Date formatting
+url_launcher: ^6.2.2           # Phone calls
+uuid: ^4.2.2                   # Unique IDs
+timeago: ^3.6.0                # Relative timestamps
 ```
 
-## 📁 Project Structure
+---
+
+## Firebase Services
+
+| Service | Usage |
+|---------|-------|
+| **Firebase Auth** | Email/password + Google Sign-In |
+| **Cloud Firestore** | Users, Alerts (per-user + root), Contacts, Messages |
+| **Firebase Messaging** | Configured for push notifications |
+| **Firebase Realtime DB** | Listed as dependency |
+
+### Firestore Collections
+- `users/{userId}` — User profiles
+- `users/{userId}/contacts/{contactId}` — Per-user contacts
+- `alerts` (root) — Camera/AI system writes alerts here
+- `users/{userId}/alerts/{alertId}` — Per-user alerts (fallback)
+- `conversations/{conversationId}/messages/{messageId}` — Chat messages
+
+---
+
+## Project Structure
 
 ```
 lib/
-├── main.dart                     # App entry point
-├── models/                       # Data models
+├── main.dart                               # Entry point, MultiProvider, MaterialApp
+├── models/                                 # Data models
 │   ├── user_model.dart
 │   ├── alert_model.dart
 │   ├── contact_model.dart
 │   └── message_model.dart
-├── providers/                    # State management
+├── providers/                              # State management
 │   ├── auth_provider.dart
 │   ├── theme_provider.dart
 │   ├── language_provider.dart
 │   ├── alert_provider.dart
-│   └── contact_provider.dart
-├── services/                     # Business logic
-│   ├── database_service.dart
-│   └── notification_service.dart
-├── screens/                      # UI screens
+│   ├── contact_provider.dart
+│   └── chat_provider.dart
+├── screens/                                # UI screens
 │   ├── splash_screen.dart
 │   ├── onboarding_screen.dart
 │   ├── auth/
@@ -233,126 +178,162 @@ lib/
 │   │   ├── alerts_tab.dart
 │   │   ├── contacts_tab.dart
 │   │   ├── messages_tab.dart
+│   │   ├── messages_tab_new.dart
 │   │   └── settings_tab.dart
 │   ├── alert/
 │   │   └── alert_detail_screen.dart
 │   ├── contact/
 │   │   └── add_contact_screen.dart
+│   ├── chat/
+│   │   └── chat_screen.dart
 │   └── settings/
 │       └── camera_integration_screen.dart
+├── services/                               # Business logic & data access
+│   ├── database_service.dart               # SQLite singleton
+│   ├── firebase_service.dart               # Firebase init
+│   ├── firebase_auth_service.dart          # Firebase Auth
+│   ├── firestore_service.dart              # Firestore CRUD + streams
+│   ├── firebase_options.dart               # Firebase config
+│   └── notification_service.dart           # Local notifications
 └── utils/
-    └── app_localization.dart      # Localization helper
+    └── app_localization.dart               # 151 keys × 2 languages
 ```
-
-## 🎨 UI/UX Features
-
-- **Material Design 3** with custom theme
-- **Smooth animations** throughout the app
-- **Responsive design** for different screen sizes
-- **Intuitive navigation** with bottom navigation bar
-- **Pull-to-refresh** on data lists
-- **Swipe gestures** where applicable
-- **Loading indicators** for async operations
-- **Error handling** with user-friendly messages
-- **Empty states** with helpful guidance
-
-## 🔒 Security & Privacy
-
-- Passwords stored locally (in production, should be hashed)
-- All data processing done locally
-- No data sent to external servers without user consent
-- Secure storage using SQLite
-- Permission-based access to phone features
-
-## 📱 Supported Platforms
-
-- ✅ Android (Primary target)
-- ✅ iOS (Compatible)
-- ⚠️ Web (Partial support, notifications limited)
-- ⚠️ Desktop (Partial support)
-
-## 🧪 Testing
-
-To test the alert system:
-
-1. Login to the app
-2. Add emergency contacts
-3. Navigate to Dashboard
-4. Tap "Test Alert" button
-5. Confirm the test
-6. Check notifications and alert history
-
-## 🎓 Academic Context
-
-This app is part of a graduation project for:
-- **Institution**: College of Computing and Information Technology, AASTMT
-- **Project**: Smart AI Camera for Medical Emergency Detection Using Gestures and Abnormal Activity Recognition
-- **Year**: 2025
-- **Location**: Alexandria
-
-### Project Objectives
-- Develop a vision-based monitoring system
-- Implement pose estimation for emergency detection
-- Recognize emergency gestures
-- Detect falls and abnormal activities
-- Provide real-time alerts
-- Operate on standard hardware
-
-## 🛣️ Roadmap
-
-### Phase 1: Mobile App (✅ Completed)
-- [x] Authentication system
-- [x] Alert management
-- [x] Contact management
-- [x] Dark/Light theme
-- [x] Localization
-- [x] Notifications
-- [x] UI/UX design
-
-### Phase 2: AI Backend (🔄 In Progress)
-- [ ] OpenCV video capture
-- [ ] MediaPipe Pose integration
-- [ ] Gesture recognition models
-- [ ] Fall detection algorithm
-- [ ] Abnormal activity detection
-- [ ] REST API development
-
-### Phase 3: Integration (📅 Planned)
-- [ ] WebSocket real-time connection
-- [ ] API authentication
-- [ ] Video streaming (optional)
-- [ ] Enhanced notifications
-- [ ] Camera management UI
-- [ ] Multi-camera support
-
-### Phase 4: Deployment (📅 Future)
-- [ ] Production server setup
-- [ ] Cloud deployment
-- [ ] Performance optimization
-- [ ] Security audit
-- [ ] User testing
-- [ ] Documentation finalization
-
-## 👨‍💻 Developer
-
-**ZYAD**
-- Graduation Project 2025
-- College of Computing and Information Technology, AASTMT
-- Alexandria, Egypt
-
-## 📄 License
-
-This project is developed for academic purposes as part of a graduation project.
-
-## 🙏 Acknowledgments
-
-- Flutter team for the amazing framework
-- Material Design for UI guidelines
-- Open source community for packages and inspiration
-- Project supervisor and academic institution
 
 ---
 
-**Note**: This app is currently in development as part of an academic project. The AI detection backend is being developed separately and will be integrated in future updates.
+## Getting Started
 
-For questions or support, please contact the development team.
+### Prerequisites
+- Flutter SDK ^3.9.2
+- Dart SDK
+- Android Studio / VS Code
+- Android device or emulator
+
+### Installation
+```bash
+git clone <repository-url>
+cd grad_app
+flutter pub get
+flutter run
+```
+
+### First-Time Setup
+1. Launch the app
+2. Complete the 3-page onboarding
+3. Register a new account or sign in with Google
+4. Add emergency contacts
+5. Test the alert system using "Test Alert" on the Dashboard
+6. Explore settings to customize theme and language
+
+---
+
+## AI Backend Integration (Future)
+
+The mobile app is designed to connect with a Python-based AI detection server:
+
+```
+Camera → AI Server → Detection → Alert Generation → Mobile App → Emergency Contacts
+```
+
+### Components (To be integrated)
+- **OpenCV** — Video capture & processing
+- **MediaPipe Pose** — Skeleton detection (33 keypoints)
+- **TensorFlow** — Gesture recognition (MLP/LSTM)
+- **Scikit-learn** — Anomaly detection (Isolation Forest)
+- **REST API / WebSocket** — Communication with mobile app
+
+### Planned API Endpoints
+```
+POST /api/alert/send          — Send alert from AI server to app
+GET  /api/alerts              — Get alert history
+PUT  /api/alert/:id/status    — Update alert status
+POST /api/camera/connect      — Connect camera to system
+GET  /api/camera/status       — Get camera status
+POST /api/config/thresholds   — Update detection thresholds
+```
+
+---
+
+## Navigation Map
+
+```
+SplashScreen (animated)
+ ├── First Launch → OnboardingScreen (3 pages) → LoginScreen
+ ├── Authenticated → HomeScreen
+ └── Unauthenticated → LoginScreen ↔ RegisterScreen
+
+HomeScreen (5-tab Bottom Navigation)
+ ├── Tab 1 — Dashboard: stats, recent alerts, welcome
+ ├── Tab 2 — Alerts: full list, clear-all, tap for details
+ ├── Tab 3 — Contacts: list, call, emergency toggle
+ ├── Tab 4 — Messages: contact list → chat screen
+ └── Tab 5 — Settings: theme, language, camera, logout
+
+Detail Screens:
+ ├── AlertDetailScreen — Acknowledge/Resolve/Delete/False Alarm
+ ├── AddContactScreen — Add or edit contact
+ ├── ChatScreen — Real-time messaging with read receipts
+ └── CameraIntegrationScreen — Setup guide + server config
+```
+
+---
+
+## Current Status
+
+| Module | Status | Notes |
+|--------|--------|-------|
+| Authentication | Complete | Email/password + Google Sign-In |
+| Dashboard & Alerts | Complete | Real-time Firestore listener |
+| Contacts | Complete | Full CRUD + emergency toggle |
+| Real-Time Chat | Complete | Read receipts, date headers |
+| Camera Integration | UI Ready | Backend not yet connected |
+| Voice/Video Calls | Placeholder | UI buttons only |
+| Tests | Minimal | 1 smoke test |
+| Assets | Empty | Folders created |
+
+---
+
+## Roadmap
+
+**Phase 1: Mobile App** (Completed)
+- Authentication, alerts, contacts, chat, theming, localization, notifications
+
+**Phase 2: AI Backend** (In Progress)
+- OpenCV video capture, MediaPipe Pose, gesture recognition, fall detection, REST API
+
+**Phase 3: Integration** (Planned)
+- WebSocket real-time connection, API auth, camera management UI, multi-camera support
+
+**Phase 4: Deployment** (Future)
+- Production server, cloud deployment, performance optimization, security audit, user testing
+
+---
+
+## Academic Context
+
+**Institution:** College of Computing and Information Technology, AASTMT  
+**Project:** Smart AI Camera for Medical Emergency Detection Using Gestures and Abnormal Activity Recognition  
+**Year:** 2025  
+**Location:** Alexandria, Egypt  
+
+### Project Objectives
+- Develop a vision-based monitoring system for elderly care
+- Implement pose estimation for emergency detection
+- Recognize emergency gestures and falls
+- Detect abnormal activities in real time
+- Provide real-time alerts to caregivers
+- Operate on standard consumer hardware
+
+---
+
+## Developer
+
+**ZYAD** — Graduation Project 2025  
+College of Computing and Information Technology, AASTMT  
+Alexandria, Egypt
+
+---
+
+## License
+
+This project is developed for academic purposes as part of a graduation project.
